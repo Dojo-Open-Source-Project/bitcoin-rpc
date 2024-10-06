@@ -1,0 +1,39 @@
+{
+	"name": "@samouraiwallet/bitcoin-rpc",
+	"version": "0.1.0",
+	"engines": {
+		"node": ">=18"
+	},
+	"description": "A thin Bitcoin RPC client for Node.js.",
+	"keywords": ["bitcoin", "rpc", "client"],
+	"author": "Katana Cryptographic Ltd.",
+	"type": "module",
+	"main": "dist/index.js",
+	"exports": {
+		".": {
+			"import": "./dist/index.js",
+			"types": "./dist/index.d.ts"
+		}
+	},
+	"types": "dist/index.d.ts",
+	"scripts": {
+		"test": "echo \"Error: no test specified\"",
+		"format": "pnpm biome format --write src/",
+		"lint": "pnpm biome lint src/",
+		"lint:fix": "pnpm biome lint --write src/",
+		"typescript": "tsc --noEmit",
+		"build:clean": "rm -rf dist",
+		"build:esm": "tsc -p tsconfig.build.json",
+		"build": "pnpm run build:clean && pnpm run build:esm",
+		"prepack": "pnpm install && pnpm run lint && pnpm run typescript && pnpm run test && pnpm run build"
+	},
+	"license": "LGPL-3.0",
+	"devDependencies": {
+		"@biomejs/biome": "1.9.3",
+		"@types/node": "^20.16.10",
+		"typescript": "^5.6.2"
+	},
+	"dependencies": {
+		"undici": "^6.19.8"
+	}
+}

@@ -1,0 +1,10 @@
+src/
+test/
+coverage/
+.vscode/
+.idea/
+.gitignore
+biome.json
+vitest.config.ts
+
+tsconfig*
