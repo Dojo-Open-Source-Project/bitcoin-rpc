@@ -44,13 +44,8 @@ export type RPC2Response =
 	  };
 
 // Response types
-export type GetBlockHeaderVerbosity = boolean;
 
-export type GetBlockHeaderReturnType<T> = T extends false
-	? string
-	: T extends true
-		? JSONType
-		: never;
+export type GetBlockHeaderReturnType<T> = T extends false ? string : JSONType;
 
 export type GetRawTransactionReturnType<T> = T extends true ? JSONType : string;
 
@@ -60,10 +55,8 @@ export type GetRawMempoolReturnType<T, U> = T extends true
 		? JSONType
 		: string[];
 
-export type GetBlockVerbosity = 0 | 1;
+export type GetBlockVerbosity = 0 | 1 | 2;
 
-export type GetBlockReturnType<T> = T extends 0
+export type GetBlockReturnType<T extends GetBlockVerbosity> = T extends 0
 	? string
-	: T extends 1
-		? JSONType
-		: never;
+	: JSONType;

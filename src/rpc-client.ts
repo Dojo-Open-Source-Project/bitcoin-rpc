@@ -3,7 +3,6 @@ import { Agent, fetch } from "undici";
 
 import type {
 	GetBlockHeaderReturnType,
-	GetBlockHeaderVerbosity,
 	GetBlockReturnType,
 	GetBlockVerbosity,
 	GetRawMempoolReturnType,
@@ -262,13 +261,13 @@ export class RPCClient {
 		return this.makeRequest({ method: "getblockcount" }, options);
 	};
 
-	public getblockheader = <T extends GetBlockHeaderVerbosity>(
+	public getblockheader = <T extends boolean>(
 		{
 			blockhash,
 			verbose,
 		}: {
 			blockhash: string;
-			verbose: T;
+			verbose?: T;
 		},
 		options?: RequestOptions,
 	): Promise<GetBlockHeaderReturnType<T>> => {
