@@ -156,11 +156,11 @@ export class RPCClient {
 	private makeRequest = async <T extends JSONValue>(
 		{
 			method,
-			parameters = [],
+			params = [],
 			suffix,
 		}: {
 			method: MethodName;
-			parameters?: Partial<JSONType>;
+			params?: Partial<JSONType>;
 			suffix?: string;
 		},
 		options?: RequestOptions,
@@ -169,7 +169,7 @@ export class RPCClient {
 			jsonrpc: "2.0",
 			id: `${Date.now()}${suffix == null ? "" : `-${suffix}`}`,
 			method,
-			params: parameters,
+			params,
 		};
 
 		const { body, statusCode, headers } = await this.createRequest(
@@ -277,73 +277,48 @@ export class RPCClient {
 	};
 
 	public getblockheader = <T extends boolean>(
-		{
-			blockhash,
-			verbose,
-		}: {
+		params: {
 			blockhash: string;
 			verbose?: T;
 		},
 		options?: RequestOptions,
 	): Promise<GetBlockHeaderReturnType<T>> => {
-		return this.makeRequest(
-			{ method: "getblockheader", parameters: { blockhash, verbose } },
-			options,
-		);
+		return this.makeRequest({ method: "getblockheader", params }, options);
 	};
 
 	public getrawtransaction = <T extends boolean>(
-		{
-			txid,
-			verbose,
-			blockhash,
-		}: { txid: string; verbose?: T; blockhash?: string },
+		params: { txid: string; verbose?: T; blockhash?: string },
 		options?: RequestOptions,
 	): Promise<GetRawTransactionReturnType<T>> => {
-		return this.makeRequest(
-			{ method: "getrawtransaction", parameters: { txid, verbose, blockhash } },
-			options,
-		);
+		return this.makeRequest({ method: "getrawtransaction", params }, options);
 	};
 
 	public getrawmempool = <T extends boolean, U extends boolean>(
-		{ verbose, mempool_sequence }: { verbose?: T; mempool_sequence?: U },
+		params: { verbose?: T; mempool_sequence?: U },
 		options?: RequestOptions,
 	): Promise<GetRawMempoolReturnType<T, U>> => {
-		return this.makeRequest(
-			{ method: "getrawmempool", parameters: { verbose, mempool_sequence } },
-			options,
-		);
+		return this.makeRequest({ method: "getrawmempool", params }, options);
 	};
 
 	public getblock = <T extends GetBlockVerbosity>(
-		{ blockhash, verbosity }: { blockhash: string; verbosity: T },
+		params: { blockhash: string; verbosity: T },
 		options?: RequestOptions,
 	): Promise<GetBlockReturnType<T>> => {
-		return this.makeRequest(
-			{ method: "getblock", parameters: { blockhash, verbosity } },
-			options,
-		);
+		return this.makeRequest({ method: "getblock", params }, options);
 	};
 
 	public getblockhash = (
-		{ height }: { height: number },
+		params: { height: number },
 		options?: RequestOptions,
 	): Promise<string> => {
-		return this.makeRequest(
-			{ method: "getblockhash", parameters: { height } },
-			options,
-		);
+		return this.makeRequest({ method: "getblockhash", params }, options);
 	};
 
 	public getblocktemplate = (
-		obj: JSONType,
+		params: JSONType,
 		options?: RequestOptions,
 	): Promise<JSONType> => {
-		return this.makeRequest(
-			{ method: "getblocktemplate", parameters: obj },
-			options,
-		);
+		return this.makeRequest({ method: "getblocktemplate", params }, options);
 	};
 
 	public getblockchaininfo = (options?: RequestOptions): Promise<JSONType> => {
@@ -351,10 +326,7 @@ export class RPCClient {
 	};
 
 	public scantxoutset = (
-		{
-			action,
-			scanobjects,
-		}: {
+		params: {
 			action: "start" | "abort" | "status";
 			scanobjects:
 				| string[]
@@ -362,23 +334,14 @@ export class RPCClient {
 		},
 		options?: RequestOptions,
 	): Promise<JSONType> => {
-		return this.makeRequest(
-			{ method: "scantxoutset", parameters: { action, scanobjects } },
-			options,
-		);
+		return this.makeRequest({ method: "scantxoutset", params }, options);
 	};
 
 	public sendrawtransaction = (
-		{
-			hexstring,
-			maxfeerate,
-		}: { hexstring: string; maxfeerate?: number | string },
+		params: { hexstring: string; maxfeerate?: number | string },
 		options?: RequestOptions,
 	): Promise<string> => {
-		return this.makeRequest(
-			{ method: "sendrawtransaction", parameters: { hexstring, maxfeerate } },
-			options,
-		);
+		return this.makeRequest({ method: "sendrawtransaction", params }, options);
 	};
 
 	public getuptime = (options?: RequestOptions): Promise<string> => {
