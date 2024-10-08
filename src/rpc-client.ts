@@ -1,5 +1,5 @@
 import { readFileSync } from "node:fs";
-import { Agent, fetch } from "undici";
+import { request } from "undici";
 
 import type {
 	GetBlockHeaderReturnType,
@@ -141,18 +141,15 @@ export class RPCClient {
 
 		const body = JSON.stringify(reqBody);
 
-		return fetch(url, {
+		return request(url, {
 			method: "POST",
-			keepalive: true,
 			headers: {
-				"Content-Type": "application/json",
 				Authorization: `Basic ${Buffer.from(`${this.username}:${this.password}`).toString("base64")}`,
+				"Content-Type": "application/json",
 			},
-			signal: options?.abortSignal,
 			body,
-			dispatcher: new Agent({
-				bodyTimeout: options?.timeout || this.timeout,
-			}),
+			signal: options?.abortSignal,
+			bodyTimeout: options?.timeout || this.timeout,
 		});
 	};
 
@@ -175,15 +172,24 @@ export class RPCClient {
 			params: parameters,
 		};
 
-		const request = this.createRequest(reqBody, options);
+		const { body, statusCode, headers } = await this.createRequest(
+			reqBody,
+			options,
+		);
 
-		const response = await request;
+		const responseText = await body.text();
 
-		if (!response.ok) {
-			throw new Error(`Received invalid status code: ${response.status}`);
+		if (statusCode !== 200) {
+			if (statusCode === 401) throw new Error("Invalid credentials");
+			const contentType = headers["content-type"];
+			const response =
+				contentType === "application/json"
+					? JSON.parse(responseText)
+					: responseText;
+			throw new Error(response.error || response);
 		}
 
-		const data = await response.json();
+		const data = JSON.parse(responseText);
 
 		if (isRPC2Response(data)) {
 			if ("error" in data) {
@@ -222,15 +228,24 @@ export class RPCClient {
 			};
 		});
 
-		const request = this.createRequest(reqBody, options);
+		const { body, statusCode, headers } = await this.createRequest(
+			reqBody,
+			options,
+		);
 
-		const response = await request;
+		const responseText = await body.text();
 
-		if (!response.ok) {
-			throw new Error(`Received invalid status code: ${response.status}`);
+		if (statusCode !== 200) {
+			if (statusCode === 401) throw new Error("Invalid credentials");
+			const contentType = headers["content-type"];
+			const response =
+				contentType === "application/json"
+					? JSON.parse(responseText)
+					: responseText;
+			throw new Error(response.error || response);
 		}
 
-		const data = await response.json();
+		const data = JSON.parse(responseText);
 
 		if (Array.isArray(data)) {
 			if (data.every(isRPC2Response)) {
