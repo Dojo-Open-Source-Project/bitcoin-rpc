@@ -1,15 +1,11 @@
 {
 	"name": "@samouraiwallet/bitcoin-rpc",
-	"version": "0.4.0",
+	"version": "0.5.0",
 	"engines": {
 		"node": ">=18"
 	},
 	"description": "A thin Bitcoin RPC client for Node.js.",
-	"keywords": [
-		"bitcoin",
-		"rpc",
-		"client"
-	],
+	"keywords": ["bitcoin", "rpc", "client"],
 	"author": "Katana Cryptographic Ltd.",
 	"type": "module",
 	"main": "dist/index.js",
