@@ -5,7 +5,11 @@
 		"node": ">=18"
 	},
 	"description": "A thin Bitcoin RPC client for Node.js.",
-	"keywords": ["bitcoin", "rpc", "client"],
+	"keywords": [
+		"bitcoin",
+		"rpc",
+		"client"
+	],
 	"author": "Katana Cryptographic Ltd.",
 	"type": "module",
 	"main": "dist/index.js",
@@ -30,10 +34,10 @@
 	"license": "LGPL-3.0",
 	"devDependencies": {
 		"@biomejs/biome": "1.9.3",
-		"@types/node": "^20.16.10",
-		"typescript": "^5.6.2"
+		"@types/node": "^20.17.24",
+		"typescript": "^5.8.2"
 	},
 	"dependencies": {
-		"undici": "^6.19.8"
+		"undici": "^6.21.1"
 	}
 }
