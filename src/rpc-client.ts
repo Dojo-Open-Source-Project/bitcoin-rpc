@@ -60,9 +60,7 @@ const isRPC2Response = (payload: unknown): payload is RPC2Response => {
 export class RPCClient {
 	private readonly username: string;
 	private readonly password: string;
-	private readonly host: string;
-	private readonly port: number;
-	private readonly protocol: Protocol;
+	private readonly url: URL;
 	private readonly timeout: number;
 
 	constructor(options: RPCOptions) {
@@ -73,9 +71,9 @@ export class RPCClient {
 		this.password = credentials.password;
 
 		const defaults = this.getDefaults(options);
-		this.host = defaults.host;
-		this.port = defaults.port;
-		this.protocol = defaults.protocol;
+		this.url = new URL(
+			`${defaults.protocol}://${defaults.host}:${defaults.port}/`,
+		);
 		this.timeout = defaults.timeout;
 	}
 
@@ -137,11 +135,9 @@ export class RPCClient {
 
 	// biome-ignore  lint/suspicious/noExplicitAny: no strict type checking required
 	private createRequest = (reqBody: any, options?: RequestOptions) => {
-		const url = new URL(`${this.protocol}://${this.host}:${this.port}/`);
-
 		const body = JSON.stringify(reqBody);
 
-		return request(url, {
+		return request(this.url, {
 			method: "POST",
 			headers: {
 				Authorization: `Basic ${Buffer.from(`${this.username}:${this.password}`).toString("base64")}`,
