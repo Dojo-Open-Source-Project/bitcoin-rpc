@@ -58,8 +58,10 @@ const isRPC2Response = (payload: unknown): payload is RPC2Response => {
 };
 
 export class RPCClient {
-	private readonly username: string;
-	private readonly password: string;
+	private username: string;
+	private password: string;
+	private cookie: string | null = null;
+	private usingCookie = false;
 	private readonly url: URL;
 	private readonly timeout: number;
 
@@ -83,12 +85,22 @@ export class RPCClient {
 		}
 	}
 
+	private refreshCookieCredentials() {
+		if (this.cookie) {
+			const [username, password] = this.handleCookie(this.cookie);
+
+			this.username = username;
+			this.password = password;
+		}
+	}
+
 	private getCredentials(options: RPCOptions): {
 		username: string;
 		password: string;
 	} {
 		let { username, password, cookie } = options;
 		if (cookie) {
+			this.usingCookie = true;
 			[username, password] = this.handleCookie(cookie);
 		}
 		if (!username || !password) {
@@ -176,7 +188,14 @@ export class RPCClient {
 		const responseText = await body.text();
 
 		if (statusCode !== 200) {
-			if (statusCode === 401) throw new Error("Invalid credentials");
+			if (statusCode === 401) {
+				if (this.usingCookie) {
+					this.refreshCookieCredentials();
+					return await this.makeRequest({ method, params, suffix }, options);
+				}
+
+				throw new Error("Invalid credentials");
+			}
 			const contentType = headers["content-type"];
 			const response =
 				contentType === "application/json"
@@ -232,7 +251,14 @@ export class RPCClient {
 		const responseText = await body.text();
 
 		if (statusCode !== 200) {
-			if (statusCode === 401) throw new Error("Invalid credentials");
+			if (statusCode === 401) {
+				if (this.usingCookie) {
+					this.refreshCookieCredentials();
+					return await this.batch(rpcRequests, options);
+				}
+
+				throw new Error("Invalid credentials");
+			}
 			const contentType = headers["content-type"];
 			const response =
 				contentType === "application/json"
