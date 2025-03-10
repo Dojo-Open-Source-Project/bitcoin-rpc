@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.5.0
+- Refresh cookie when authentication fails
+- Updated dependencies
+
 ## v0.4.0
 - Fixed how params are passed down
 

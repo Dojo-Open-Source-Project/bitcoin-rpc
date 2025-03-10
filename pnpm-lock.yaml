@@ -9,18 +9,18 @@ importers:
   .:
     dependencies:
       undici:
-        specifier: ^6.19.8
-        version: 6.19.8
+        specifier: ^6.21.1
+        version: 6.21.1
     devDependencies:
       '@biomejs/biome':
         specifier: 1.9.3
         version: 1.9.3
       '@types/node':
-        specifier: ^20.16.10
-        version: 20.16.10
+        specifier: ^20.17.24
+        version: 20.17.24
       typescript:
-        specifier: ^5.6.2
-        version: 5.6.2
+        specifier: ^5.8.2
+        version: 5.8.2
 
 packages:
 
@@ -77,19 +77,19 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@types/node@20.16.10':
-    resolution: {integrity: sha512-vQUKgWTjEIRFCvK6CyriPH3MZYiYlNy0fKiEYHWbcoWLEgs4opurGGKlebrTLqdSMIbXImH6XExNiIyNUv3WpA==}
+  '@types/node@20.17.24':
+    resolution: {integrity: sha512-d7fGCyB96w9BnWQrOsJtpyiSaBcAYYr75bnK6ZRjDbql2cGLj/3GsL5OYmLPNq76l7Gf2q4Rv9J2o6h5CrD9sA==}
 
-  typescript@5.6.2:
-    resolution: {integrity: sha512-NW8ByodCSNCwZeghjN3o+JX5OFH0Ojg6sadjEKY4huZ52TqbJTJnDo5+Tw98lSy63NZvi4n+ez5m2u5d4PkZyw==}
+  typescript@5.8.2:
+    resolution: {integrity: sha512-aJn6wq13/afZp/jT9QZmwEjDqqvSGp1VT5GVg+f/t6/oVyrgXM6BY1h9BRh/O5p3PlUPAe+WuiEZOmb/49RqoQ==}
     engines: {node: '>=14.17'}
     hasBin: true
 
   undici-types@6.19.8:
     resolution: {integrity: sha512-ve2KP6f/JnbPBFyobGHuerC9g1FYGn/F8n1LWTwNxCEzd6IfqTwUQcNXgEtmmQ6DlRrC1hrSrBnCZPokRrDHjw==}
 
-  undici@6.19.8:
-    resolution: {integrity: sha512-U8uCCl2x9TK3WANvmBavymRzxbfFYG+tAu+fgx3zxQy3qdagQqBLwJVrdyO1TBfUXvfKveMKJZhpvUYoOjM+4g==}
+  undici@6.21.1:
+    resolution: {integrity: sha512-q/1rj5D0/zayJB2FraXdaWxbhWiNKDvu8naDT2dl1yTlvJp4BLtOcp2a5BvgGNQpYYJzau7tf1WgKv3b+7mqpQ==}
     engines: {node: '>=18.17'}
 
 snapshots:
@@ -129,12 +129,12 @@ snapshots:
   '@biomejs/cli-win32-x64@1.9.3':
     optional: true
 
-  '@types/node@20.16.10':
+  '@types/node@20.17.24':
     dependencies:
       undici-types: 6.19.8
 
-  typescript@5.6.2: {}
+  typescript@5.8.2: {}
 
   undici-types@6.19.8: {}
 
-  undici@6.19.8: {}
+  undici@6.21.1: {}
