@@ -14,6 +14,7 @@ import type {
 	RPC2Response,
 	RPCResponse,
 	RequestOptions,
+	GetTxOutReturnType,
 } from "./types";
 
 /**
@@ -161,13 +162,13 @@ export class RPCClient {
 		});
 	};
 
-	private makeRequest = async <T extends JSONValue>(
+	public raw = async <T extends JSONValue>(
 		{
 			method,
 			params = [],
 			suffix,
 		}: {
-			method: MethodName;
+			method: MethodName | string;
 			params?: Partial<JSONType>;
 			suffix?: string;
 		},
@@ -191,7 +192,7 @@ export class RPCClient {
 			if (statusCode === 401) {
 				if (this.usingCookie) {
 					this.refreshCookieCredentials();
-					return await this.makeRequest({ method, params, suffix }, options);
+					return await this.raw({ method, params, suffix }, options);
 				}
 
 				throw new Error("Invalid credentials");
@@ -283,19 +284,19 @@ export class RPCClient {
 	};
 
 	public getnetworkinfo = (options?: RequestOptions): Promise<JSONType> => {
-		return this.makeRequest({ method: "getnetworkinfo" }, options);
+		return this.raw({ method: "getnetworkinfo" }, options);
 	};
 
 	public getmempoolinfo = (options?: RequestOptions): Promise<JSONType> => {
-		return this.makeRequest({ method: "getmempoolinfo" }, options);
+		return this.raw({ method: "getmempoolinfo" }, options);
 	};
 
 	public getbestblockhash = (options?: RequestOptions): Promise<string> => {
-		return this.makeRequest({ method: "getbestblockhash" }, options);
+		return this.raw({ method: "getbestblockhash" }, options);
 	};
 
 	public getblockcount = (options?: RequestOptions): Promise<number> => {
-		return this.makeRequest({ method: "getblockcount" }, options);
+		return this.raw({ method: "getblockcount" }, options);
 	};
 
 	public getblockheader = <T extends boolean>(
@@ -305,46 +306,53 @@ export class RPCClient {
 		},
 		options?: RequestOptions,
 	): Promise<GetBlockHeaderReturnType<T>> => {
-		return this.makeRequest({ method: "getblockheader", params }, options);
+		return this.raw({ method: "getblockheader", params }, options);
 	};
 
 	public getrawtransaction = <T extends boolean>(
 		params: { txid: string; verbose?: T; blockhash?: string },
 		options?: RequestOptions,
 	): Promise<GetRawTransactionReturnType<T>> => {
-		return this.makeRequest({ method: "getrawtransaction", params }, options);
+		return this.raw({ method: "getrawtransaction", params }, options);
 	};
 
 	public getrawmempool = <T extends boolean, U extends boolean>(
 		params: { verbose?: T; mempool_sequence?: U },
 		options?: RequestOptions,
 	): Promise<GetRawMempoolReturnType<T, U>> => {
-		return this.makeRequest({ method: "getrawmempool", params }, options);
+		return this.raw({ method: "getrawmempool", params }, options);
 	};
 
 	public getblock = <T extends GetBlockVerbosity>(
 		params: { blockhash: string; verbosity: T },
 		options?: RequestOptions,
 	): Promise<GetBlockReturnType<T>> => {
-		return this.makeRequest({ method: "getblock", params }, options);
+		return this.raw({ method: "getblock", params }, options);
 	};
 
 	public getblockhash = (
 		params: { height: number },
 		options?: RequestOptions,
 	): Promise<string> => {
-		return this.makeRequest({ method: "getblockhash", params }, options);
+		return this.raw({ method: "getblockhash", params }, options);
 	};
 
 	public getblocktemplate = (
 		params: JSONType,
 		options?: RequestOptions,
 	): Promise<JSONType> => {
-		return this.makeRequest({ method: "getblocktemplate", params }, options);
+		return this.raw({ method: "getblocktemplate", params }, options);
 	};
 
 	public getblockchaininfo = (options?: RequestOptions): Promise<JSONType> => {
-		return this.makeRequest({ method: "getblockchaininfo" }, options);
+		return this.raw({ method: "getblockchaininfo" }, options);
+	};
+
+	public gettxout = (
+		params: { txid: string; n: number; include_mempool?: boolean },
+		options?: RequestOptions,
+	): Promise<GetTxOutReturnType> => {
+		return this.raw({ method: "gettxout", params }, options);
 	};
 
 	public scantxoutset = (
@@ -356,17 +364,17 @@ export class RPCClient {
 		},
 		options?: RequestOptions,
 	): Promise<JSONType> => {
-		return this.makeRequest({ method: "scantxoutset", params }, options);
+		return this.raw({ method: "scantxoutset", params }, options);
 	};
 
 	public sendrawtransaction = (
 		params: { hexstring: string; maxfeerate?: number | string },
 		options?: RequestOptions,
 	): Promise<string> => {
-		return this.makeRequest({ method: "sendrawtransaction", params }, options);
+		return this.raw({ method: "sendrawtransaction", params }, options);
 	};
 
 	public getuptime = (options?: RequestOptions): Promise<string> => {
-		return this.makeRequest({ method: "uptime" }, options);
+		return this.raw({ method: "uptime" }, options);
 	};
 }
