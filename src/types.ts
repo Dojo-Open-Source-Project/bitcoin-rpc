@@ -60,3 +60,17 @@ export type GetBlockVerbosity = 0 | 1 | 2;
 export type GetBlockReturnType<T extends GetBlockVerbosity> = T extends 0
 	? string
 	: JSONType;
+
+export type GetTxOutReturnType = {
+	bestblock: string;
+	confirmations: number;
+	value: number;
+	scriptPubKey: {
+		asm: string;
+		desc: string;
+		hex: string;
+		address: string;
+		type: string;
+	};
+	coinbase: boolean;
+};

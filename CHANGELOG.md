@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.6.0
+- Added gettxout method
+- Made "raw" request method public
+
 ## v0.5.0
 - Refresh cookie when authentication fails
 - Updated dependencies
