@@ -11,10 +11,10 @@ import type {
 	JSONValue,
 	MethodName,
 	Protocol,
-	RPC2Response,
-	RPCResponse,
 	RequestOptions,
 	GetTxOutReturnType,
+	RPCErrorResponse,
+	RPCSuccessResponse,
 } from "./types";
 
 /**
@@ -39,22 +39,25 @@ export type RPCOptions = {
 	timeout?: number;
 };
 
-const isRPCResponse = (payload: unknown): payload is RPCResponse => {
+const isRPCErrorResponse = (payload: unknown): payload is RPCErrorResponse => {
+	return (
+		typeof payload === "object" &&
+		payload !== null &&
+		"id" in payload &&
+		"error" in payload &&
+		payload.error != null
+	);
+};
+
+const isRPCSuccessResponse = (
+	payload: unknown,
+): payload is RPCSuccessResponse => {
 	return (
 		typeof payload === "object" &&
 		payload !== null &&
 		"id" in payload &&
 		"result" in payload &&
-		"error" in payload
-	);
-};
-
-const isRPC2Response = (payload: unknown): payload is RPC2Response => {
-	return (
-		typeof payload === "object" &&
-		payload !== null &&
-		"jsonrpc" in payload &&
-		payload.jsonrpc === "2.0"
+		payload.result != null
 	);
 };
 
@@ -148,15 +151,13 @@ export class RPCClient {
 
 	// biome-ignore  lint/suspicious/noExplicitAny: no strict type checking required
 	private createRequest = (reqBody: any, options?: RequestOptions) => {
-		const body = JSON.stringify(reqBody);
-
 		return request(this.url, {
 			method: "POST",
 			headers: {
 				Authorization: `Basic ${Buffer.from(`${this.username}:${this.password}`).toString("base64")}`,
 				"Content-Type": "application/json",
 			},
-			body,
+			body: JSON.stringify(reqBody),
 			signal: options?.abortSignal,
 			bodyTimeout: options?.timeout || this.timeout,
 		});
@@ -207,17 +208,11 @@ export class RPCClient {
 
 		const data = JSON.parse(responseText);
 
-		if (isRPC2Response(data)) {
-			if ("error" in data) {
-				throw new Error(`Code: ${data.error.code}, ${data.error.message}`);
-			}
-			return data.result as T;
+		if (isRPCErrorResponse(data)) {
+			throw new Error(`Code: ${data.error.code}, ${data.error.message}`);
 		}
 
-		if (isRPCResponse(data)) {
-			if (data.error !== null) {
-				throw new Error(`Code: ${data.error.code}, ${data.error.message}`);
-			}
+		if (isRPCSuccessResponse(data)) {
 			return data.result as T;
 		}
 
@@ -231,7 +226,7 @@ export class RPCClient {
 			id?: string | number;
 		}>,
 		options?: RequestOptions,
-	): Promise<RPCResponse[] | RPC2Response[]> => {
+	): Promise<Array<RPCSuccessResponse | RPCErrorResponse>> => {
 		const now = Date.now();
 		const reqBody = rpcRequests.map(({ method, params, id }, index) => {
 			id = id || `${now}-${index}`;
@@ -271,11 +266,13 @@ export class RPCClient {
 		const data = JSON.parse(responseText);
 
 		if (Array.isArray(data)) {
-			if (data.every(isRPC2Response)) {
-				return data;
-			}
-
-			if (data.every(isRPCResponse)) {
+			if (
+				data.every(
+					(rpcResponse) =>
+						isRPCSuccessResponse(rpcResponse) ||
+						isRPCErrorResponse(rpcResponse),
+				)
+			) {
 				return data;
 			}
 		}

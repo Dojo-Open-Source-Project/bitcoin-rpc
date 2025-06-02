@@ -25,23 +25,15 @@ export type RequestOptions = {
 	abortSignal?: AbortSignal;
 };
 
-export type RPCResponse = {
+export type RPCSuccessResponse = {
 	id: number | string;
 	result: JSONValue;
-	error: { code: number; message: string; data?: unknown } | null;
 };
 
-export type RPC2Response =
-	| {
-			jsonrpc: "2.0";
-			id: number | string;
-			result: JSONValue;
-	  }
-	| {
-			jsonrpc: "2.0";
-			id: number | string;
-			error: { code: number; message: string; data?: unknown };
-	  };
+export type RPCErrorResponse = {
+	id: number | string;
+	error: { code: number; message: string; data?: unknown };
+};
 
 // Response types
 
