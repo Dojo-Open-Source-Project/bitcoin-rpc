@@ -39,17 +39,24 @@ export type RPCOptions = {
 	timeout?: number;
 };
 
-const isRPCErrorResponse = (payload: unknown): payload is RPCErrorResponse => {
+export const isRPCErrorResponse = (
+	payload: unknown,
+): payload is RPCErrorResponse => {
 	return (
 		typeof payload === "object" &&
 		payload !== null &&
 		"id" in payload &&
 		"error" in payload &&
-		payload.error != null
+		typeof payload.error === "object" &&
+		payload.error !== null &&
+		"code" in payload.error &&
+		payload.error.code != null &&
+		"message" in payload.error &&
+		payload.error.message != null
 	);
 };
 
-const isRPCSuccessResponse = (
+export const isRPCSuccessResponse = (
 	payload: unknown,
 ): payload is RPCSuccessResponse => {
 	return (
