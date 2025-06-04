@@ -71,8 +71,8 @@ export const isRPCSuccessResponse = (
 export class RPCClient {
 	private username: string;
 	private password: string;
-	private cookie: string | null = null;
 	private usingCookie = false;
+	private readonly cookieFile: string | null = null;
 	private readonly url: URL;
 	private readonly timeout: number;
 
@@ -80,6 +80,7 @@ export class RPCClient {
 		this.validateNetwork(options.network);
 
 		const credentials = this.getCredentials(options);
+		this.cookieFile = options.cookie ?? null;
 		this.username = credentials.username;
 		this.password = credentials.password;
 
@@ -97,8 +98,8 @@ export class RPCClient {
 	}
 
 	private refreshCookieCredentials() {
-		if (this.cookie) {
-			const [username, password] = this.handleCookie(this.cookie);
+		if (this.cookieFile) {
+			const [username, password] = this.handleCookie(this.cookieFile);
 
 			this.username = username;
 			this.password = password;
