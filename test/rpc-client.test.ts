@@ -1,5 +1,93 @@
-import { assert, describe, it } from "vitest";
-import { isRPCErrorResponse, isRPCSuccessResponse } from "../src/rpc-client";
+import { assert, describe, expect, it, vi } from "vitest";
+import {
+	isRPCErrorResponse,
+	isRPCSuccessResponse,
+	RPCClient,
+} from "../src/rpc-client";
+import { MockAgent, setGlobalDispatcher } from "undici";
+
+const mockAgent = new MockAgent();
+setGlobalDispatcher(mockAgent);
+
+const mockPool = mockAgent.get("http://127.0.0.1:8332");
+
+describe("RPCClient", () => {
+	it("should initialize correctly with valid options", () => {
+		const options = {
+			network: "mainnet" as const,
+			username: "testUser",
+			password: "testPassword",
+		};
+		const client = new RPCClient(options);
+		assert.instanceOf(client, RPCClient);
+	});
+
+	it("should throw an error for invalid network", () => {
+		assert.throws(() => {
+			// @ts-expect-error
+			new RPCClient({ network: "invalid" });
+		}, /Invalid network name/);
+	});
+
+	it("should send a 'getnetworkinfo' RPC request", async () => {
+		const mockResponse = {
+			id: "1",
+			result: { networkinfo: "info" },
+		};
+
+		mockPool.intercept({ method: "POST", path: "/" }).reply(200, mockResponse);
+
+		const client = new RPCClient({
+			network: "mainnet",
+			username: "testUser",
+			password: "testPassword",
+		});
+
+		const result = await client.getnetworkinfo();
+		assert.deepEqual(result, { networkinfo: "info" });
+	});
+
+	it("should handle batch responses correctly", async () => {
+		const mockBatchResponse = JSON.stringify([
+			{ id: "1", result: "result1" },
+			{ id: "2", error: { code: 123, message: "error message" } },
+		]);
+
+		mockPool
+			.intercept({ method: "POST", path: "/" })
+			.reply(200, mockBatchResponse);
+
+		const client = new RPCClient({
+			network: "mainnet",
+			username: "testUser",
+			password: "testPassword",
+		});
+
+		const batchResult = await client.batch([
+			{ method: "method1", params: {} },
+			{ method: "method2", params: {} },
+		]);
+
+		assert.deepEqual(batchResult, [
+			{ id: "1", result: "result1" },
+			{ id: "2", error: { code: 123, message: "error message" } },
+		]);
+	});
+
+	it("should throw error on invalid credentials (401 response)", async () => {
+		mockPool.intercept({ method: "POST", path: "/" }).reply(401, "");
+
+		const client = new RPCClient({
+			network: "mainnet",
+			username: "testUser",
+			password: "wrongPassword",
+		});
+
+		await expect(client.getnetworkinfo()).rejects.toThrow(
+			/Invalid credentials/,
+		);
+	});
+});
 
 describe("isRPCErrorResponse", () => {
 	it("should return true for a valid RPC error response", () => {
